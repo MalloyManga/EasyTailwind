@@ -1,18 +1,32 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
-  "files": [],
-  "references": [
-    {
-      "path": "./.nuxt/tsconfig.app.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.server.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.shared.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.node.json"
+  // 官方文档链接
+  // 这是 Nuxt CLI 初始化时自动生成的
+  "files": [], // 明确项目里没有“单独需要编译的文件”，都交给 Nuxt 的子配置处理
+  // "references": [ // 使用 TS 的 Project References 功能，把不同部分拆开管理
+  //   {
+  //     "path": "./.nuxt/tsconfig.app.json" // 前端 app 相关类型
+  //   },
+  //   {
+  //     "path": "./.nuxt/tsconfig.server.json" // 服务端 server 相关类型
+  //   },
+  //   {
+  //     "path": "./.nuxt/tsconfig.shared.json" // app + server 共享类型
+  //   },
+  //   {
+  //     "path": "./.nuxt/tsconfig.node.json" // Node.js 运行环境类型
+  //   }
+  // ],
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".", // ① 设定“非相对导入”的起点目录为项目根（. 表示 tsconfig.json 所在目录）
+    "paths": { // ② 定义“别名 → 真实路径”的匹配表
+      "~/*": [
+        "./*"
+      ], //    当你写 `~/xxx` 时，TypeScript 把它当成 `./xxx`（也就是项目根下的 xxx）
+      "@/*": [
+        "./*"
+      ] //    当你写 `@/xxx` 时，同样当成 `./xxx`
     }
-  ]
+  }
 }
