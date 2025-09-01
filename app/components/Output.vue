@@ -1,5 +1,7 @@
 <!-- Output.vue -->
 <script setup lang="ts">
+import type { CurrentToast } from '~/types/toast'
+
 interface Prop {
     rawColor: string
 }
@@ -42,8 +44,10 @@ const handleClick = async (className: string) => {
     try {
         await navigator.clipboard.writeText(className)
         // 这里需要一个 toast 
+        emits('toastAction', 'success')
     } catch (error) {
         // 这里需要一个 toast 
+        emits('toastAction', 'error')
     }
 }
 
@@ -62,6 +66,10 @@ const twCss = computed(() => {
         }
     }
 })
+
+const emits = defineEmits<{
+    toastAction: [toastStatus: keyof CurrentToast]
+}>()
 
 </script>
 
