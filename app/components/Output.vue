@@ -1,6 +1,6 @@
 <!-- Output.vue -->
 <script setup lang="ts">
-import type { CurrentToast } from '~/types/toast'
+import type { ToastMap } from '~/types/toast'
 
 interface Prop {
     rawColor: string
@@ -68,7 +68,7 @@ const twCss = computed(() => {
 })
 
 const emits = defineEmits<{
-    toastAction: [toastStatus: keyof CurrentToast]
+    toastAction: [toastStatus: keyof ToastMap]
 }>()
 
 </script>

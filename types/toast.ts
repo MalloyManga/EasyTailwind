@@ -2,7 +2,7 @@
 
 import type { Component } from "vue"
 
-export interface CurrentToast {
+export interface ToastMap {
     success: Component
     error: Component
     none: null
