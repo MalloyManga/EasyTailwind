@@ -47,3 +47,15 @@ watch(currentToastState, (newVal) => {
     </div>
 
 </template>
+
+<style scoped>
+.toast-enter-active,
+.toast-leave-active {
+    transition: all 300ms;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+    opacity: 0;
+}
+</style>
