@@ -21,26 +21,14 @@ const tempTwClassNames: TempTwClassName[] = [
     { className: 'ring-[#f5f5f5]', gridAttr: 'col-start-3 col-end-5' },
 ]
 
+const displayTwClassNames = ref<TempTwClassName[]>(tempTwClassNames)
+
 // 两个函数用于检查颜色值为合理并且可用的的
 const useCheck = (val: string) => {
-    // 包含#的颜色检查
-    if (val.length == 4 || val.length == 7) {
-        return true
-    }
-    else {
-        emits('toastAction', 'invalid')
-        return false
-    }
+    return val.length == 4 || val.length == 7
 }
 const useCheck2 = (val: string) => {
-    // 不包含#的颜色检查
-    if (val.length == 3 || val.length == 6) {
-        return true
-    }
-    else {
-        emits('toastAction', 'invalid')
-        return false
-    }
+    return val.length == 3 || val.length == 6
 }
 const handleClick = async (className: string) => {
     try {
@@ -53,56 +41,50 @@ const handleClick = async (className: string) => {
     }
 }
 
-const twCssClassNames = computed(() => {
-    if (rawColor) {
-        // 该if仅用于绕开ts检测
-
-        if (rawColor.includes('#')) {
-            if (useCheck(rawColor)) {
-                return [
-                    { className: `bg-[${rawColor}]`, gridAttr: 'col-start-1 col-end-3' },
-                    { className: `border-[${rawColor}]`, gridAttr: 'col-start-3 col-end-5' },
-                    { className: `shadow-[${rawColor}]`, gridAttr: 'col-start-1 col-end-5' },
-                    { className: `text-[${rawColor}]`, gridAttr: 'col-start-1 col-end-3' },
-                    { className: `ring-[${rawColor}]`, gridAttr: 'col-start-3 col-end-5' },
-                ]
-            }
-        }
-        else {
-            if (useCheck2(rawColor)) {
-                return [
-                    { className: `bg-[#${rawColor}]`, gridAttr: 'col-start-1 col-end-3' },
-                    { className: `border-[#${rawColor}]`, gridAttr: 'col-start-3 col-end-5' },
-                    { className: `shadow-[#${rawColor}]`, gridAttr: 'col-start-1 col-end-5' },
-                    { className: `text-[#${rawColor}]`, gridAttr: 'col-start-1 col-end-3' },
-                    { className: `ring-[#${rawColor}]`, gridAttr: 'col-start-3 col-end-5' },
-                ]
-            }
-        }
-    }
-})
 
 const emits = defineEmits<{
     toastAction: [toastStatus: keyof ToastMap]
 }>()
 
+watch(() => rawColor, (newColor) => {
+    if (!newColor) {
+        // !newColor 相比于 newColor == '' 能够更加优雅的处理所有的falsy值 '' null undefined 而组件加载的时间没有传递这个prop 会是 undefined
+        // 并且 !newColor 是js中检查值存在性的一个惯用写法
+        displayTwClassNames.value = tempTwClassNames
+        return 
+    }
+    let isValid = false
+    let finalColor = ``
+    if (newColor.includes('#')) {
+        isValid = useCheck(newColor)
+        finalColor = newColor
+    }
+    else {
+        isValid = useCheck2(newColor)
+        finalColor = `#${newColor}`
+    }
+    if (isValid) {
+        displayTwClassNames.value = [
+            { className: `bg-[${finalColor}]`, gridAttr: 'col-start-1 col-end-3' },
+            { className: `border-[${finalColor}]`, gridAttr: 'col-start-3 col-end-5' },
+            { className: `shadow-[${finalColor}]`, gridAttr: 'col-start-1 col-end-5' },
+            { className: `text-[${finalColor}]`, gridAttr: 'col-start-1 col-end-3' },
+            { className: `ring-[${finalColor}]`, gridAttr: 'col-start-3 col-end-5' },
+        ]
+    }
+    else {
+        emits('toastAction', 'invalid')
+    }
+}, { immediate: true })
+
 </script>
 
 <template>
-    <div v-if="rawColor" class="ize-full grid grid-cols-4 auto-rows-[minmax(2rem,auto)] gap-4">
-        <button v-for="twCssClassName in twCssClassNames" :class="twCssClassName.gridAttr" type="button"
+    <div class="ize-full grid grid-cols-4 auto-rows-[minmax(2rem,auto)] gap-4">
+        <button v-for="displayTwClassName in displayTwClassNames" :class="displayTwClassName.gridAttr" @click="handleClick(displayTwClassName.className)" type="button"
             class="cursor-pointer h-fit flex justify-center items-center text-white bg-[#757de8] px-4 py-3 shadow-[0_4px_#3F51B5,4px_0_#3F51B5,-4px_0_#3F51B5,0_-4px_#3F51B5,4px_4px_rgba(255,255,255,0.3)_inset,-4px_-4px_#656ccb_inset] active:bg-[#656ccb] active:shadow-[0_4px_#3F51B5,4px_0_#3F51B5,-4px_0_#3F51B5,0_-4px_#3F51B5,-4px_-4px_rgba(255,255,255,0.3)_inset]">
-            {{ twCssClassName.className }}
-            <!-- 这里展示的话 内容和布局是分开的？ -->
+            {{ displayTwClassName.className }}
         </button>
-    </div>
-    <div v-else class="size-full grid grid-cols-4 auto-rows-[minmax(2rem,auto)] gap-4">
-        <button v-for="tempTwClassName in tempTwClassNames" :class="tempTwClassName.gridAttr"
-            @click="handleClick(tempTwClassName.className)" type="button"
-            class="cursor-pointer h-fit flex justify-center items-center text-white bg-[#757de8] px-4 py-3 shadow-[0_4px_#3F51B5,4px_0_#3F51B5,-4px_0_#3F51B5,0_-4px_#3F51B5,4px_4px_rgba(255,255,255,0.3)_inset,-4px_-4px_#656ccb_inset] active:bg-[#656ccb] active:shadow-[0_4px_#3F51B5,4px_0_#3F51B5,-4px_0_#3F51B5,0_-4px_#3F51B5,-4px_-4px_rgba(255,255,255,0.3)_inset]">
-            {{ tempTwClassName.className }}
-        </button>
-
     </div>
 
 </template>
